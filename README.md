@@ -2,7 +2,7 @@ SE
 ==
 
 Simple Events
-
+```javascript
 //create pubsub
 
 var p = pubsub()
@@ -34,3 +34,4 @@ p.clear(); //all
 p.getCache('go') 
 p.getCache()
 
+```
