@@ -49,31 +49,3 @@ function pubsub() {
     return pubsub;
 
 }
-
-//var p = pubsub();
-
-//p.once('go', function(){
-    //console.log(this, arguments);
-//})
-
-//p.publish('go', 'hi');
-//p.publish('go', 'hi');
-//p.publish('go', 'hi');
-
-//p.once('go', function(){
-    //console.log(this, arguments);
-//});
-
-//p.clear();
-
-//p.publish('go', 'hi');
-
-//p.once('go', function(){
-    //console.log(this, arguments);
-//});
-
-//p.publish('go', 'hi');
-//p.publish('go', 'hi');
-//p.publish('go', 'hi');
-
-//p.getCache();
