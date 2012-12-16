@@ -1,0 +1,79 @@
+function pubsub() {
+
+    var cache = {};
+
+    var pubsub = {
+        subscribe: function(topic, callback) {
+            cache[topic] = cache[topic] || [];
+            cache[topic].push(callback);
+        },
+        once: function(topic, callback) {
+            var once = function() {
+                pubsub.unsubscribe(topic, once);
+                callback.apply(this, arguments);
+            }
+            pubsub.subscribe(topic, once);
+        },
+        unsubscribe: function(topic, fn) {
+            if (!cache[topic]) {return};
+            for (var i = 0; i < cache[topic].length; i++) {
+                if (cache[topic][i] === fn) {
+                    cache[topic].splice(i, 1);
+                    return true;
+                }
+            }
+            return false;
+        },
+        publish: function(topic, data, ctx) {
+            if (!cache[topic]) {return};
+            for (var i = 0; i < cache[topic].length; i++) {
+                cache[topic][i].call(ctx || pubsub, data);
+            }
+        },
+        clear:function(topic){
+            if (topic) {
+                cache[topic] = [];
+            } else {
+                cache = {};
+            }
+        },
+        getCache: function(topic) {
+            if (topic) {
+                return cache[topic];
+            } else {
+                return cache;
+            }
+        }
+    };
+
+    return pubsub;
+
+}
+
+var p = pubsub()
+
+p.once('go', function(){
+    console.log(this, arguments);
+})
+
+p.publish('go', 'hi');
+p.publish('go', 'hi');
+p.publish('go', 'hi');
+
+p.once('go', function(){
+    console.log(this, arguments);
+})
+
+p.clear();
+
+p.publish('go', 'hi');
+
+p.once('go', function(){
+    console.log(this, arguments);
+})
+
+p.publish('go', 'hi');
+p.publish('go', 'hi');
+p.publish('go', 'hi');
+
+p.getCache()
