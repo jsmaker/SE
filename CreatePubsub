@@ -1,0 +1,84 @@
+function CreatePubsub(){
+
+    var pubsubs = {};
+
+    function Pubsub(name, destroy) {
+
+        name = name || 'Global';
+
+        if (pubsubs[name]) {
+            if(destroy){ 
+                pubsubs[name].clear(); 
+                pubsubs[name] = null 
+            }
+            return pubsubs[name];
+        } else {
+            if(destroy) {
+                for(var evem in pubsubs){
+                    if (pubsubs[evem]) {
+                        pubsubs[evem].clear();     
+                    }
+                }  
+                pubsubs = {};              
+                return true;
+            }
+        }
+
+        var cache = {};
+
+        var pubsub = {
+            name:name,
+            publish: function(topic, data, ctx) {
+                if (!cache[topic]) {
+                    return
+                };
+                for (var i = 0; i < cache[topic].length; i++) {
+                    cache[topic][i].call(ctx || pubsub, data);
+                }
+            },
+            subscribe: function(topic, callback) {
+                cache[topic] = cache[topic] || [];
+                cache[topic].push(callback);
+            },
+            once: function(topic, callback) {
+                var once = function() {
+                        pubsub.unsubscribe(topic, once);
+                        callback.apply(this, arguments);
+                    }
+                pubsub.subscribe(topic, once);
+            },
+            unsubscribe: function(topic, fn) {
+                if (!cache[topic]) {
+                    return
+                };
+                for (var i = 0; i < cache[topic].length; i++) {
+                    if (cache[topic][i] === fn) {
+                        cache[topic].splice(i, 1);
+                        return true;
+                    }
+                }
+                return false;
+            },
+            clear: function(topic) {
+                if (topic) {
+                    cache[topic] = [];
+                } else {
+                    cache = {};
+                }
+            },
+            getCache: function(topic) {
+                if (topic) {
+                    return cache[topic];
+                } else {
+                    return cache;
+                }
+            }
+        };
+
+        pubsubs[name] = pubsub;
+
+        return pubsub;
+    }
+
+    return Pubsub;
+}
